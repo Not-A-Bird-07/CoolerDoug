@@ -1,25 +1,57 @@
 ﻿using System.Reflection;
 using BepInEx;
 using HarmonyLib;
+using UnityEngine;
 
-namespace CoolerDoug
+namespace CoolerDoug;
+[BepInPlugin(Plugin_Info.GUID, Plugin_Info.NAME, Plugin_Info.VERSION)]
+public class Plugin : BaseUnityPlugin
 {
-    [BepInPlugin(Plugin_Info.GUID,  Plugin_Info.NAME, Plugin_Info.VERSION)]
-    public class Plugin : BaseUnityPlugin
+    public static Plugin Instance;
+    public Animator animator;
+
+    private void Awake()
     {
-        public static Plugin Instance;
+        Instance = this;
+        GorillaTagger.OnPlayerSpawned(Init);
+        new Harmony(Plugin_Info.GUID).PatchAll(Assembly.GetExecutingAssembly());
+    }
 
-        public void Awake()
+    private void Init()
+    {   //this is the model of new doug
+        GameObject betterDoug = GameObject.Find("Environment Objects/LocalObjects_Prefab/City_WorkingPrefab/CosmeticsRoomAnchor/nicegorillastore_prefab/nicegorillastore_Layout_2_prefab/PromotionsPrefab/MakeshipDigicoolDougPromoStand/Animated Open and Flying");
+
+        GameObject oldDoug = GameObject.Find("Floating Bug Holdable");//this works due to sheer luck the bug i want to find is first in the hierarchy
+        oldDoug.transform.GetChild(0).gameObject.SetActive(false);//this is the model of old doug
+        
+        GameObject newDoug = Instantiate(betterDoug, oldDoug.transform, false);
+        
+        animator = newDoug.GetComponent<Animator>();
+        
+        oldDoug.GetComponent<ThrowableBug>().animator = animator;
+        
+        //DigiCoolDoug_InHand
+        //DigiCoolDoug_Hover
+        
+        newDoug.transform.localPosition = new Vector3(0f, -0.25f, 0f);
+        newDoug.transform.localRotation = Quaternion.identity;
+        newDoug.transform.localScale = Vector3.one * 1.7f;
+    }
+}
+
+[HarmonyPatch(typeof(ThrowableBug))]
+public class Patch
+{
+    [HarmonyPatch("LateUpdateShared"), HarmonyPostfix]
+    public static void LateUpdateSharedPatch(ThrowableBug __instance)
+    {
+        if (__instance.animator == Plugin.Instance.animator)
         {
-            Instance = this;
-            new Harmony(Plugin_Info.GUID).PatchAll(Assembly.GetExecutingAssembly());
-
-            GorillaTagger.OnPlayerSpawned(Init);
-        }
-        //should run when the player spawns, but this is inconsistent
-        public void Init()
-        {
-
+            bool held = __instance.currentState == TransferrableObject.PositionState.InLeftHand || __instance.currentState == TransferrableObject.PositionState.InRightHand;
+            if(held)
+                __instance.animator.Play("DigiCoolDoug_InHand");
+            else
+                __instance.animator.Play("DigiCoolDoug_Hover");
         }
     }
 }

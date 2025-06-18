@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gorilla Tag Mod Template", "CoolerDoug\Gorilla Tag Mod Template.csproj", "{CBA0CFEE-02EC-4FF6-8A5A-96FF2973D2BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoolerDoug", "CoolerDoug\CoolerDoug.csproj", "{CBA0CFEE-02EC-4FF6-8A5A-96FF2973D2BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
